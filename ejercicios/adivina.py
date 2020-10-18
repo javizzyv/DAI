@@ -1,4 +1,3 @@
-# Este es el juego de adivinar el número.
 import random
 
 intentosRealizados = 0
@@ -9,13 +8,13 @@ miNombre = input()
 número = random.randint(1, 100)
 print('Bueno, ' + miNombre + ', estoy pensando en un número entre 1 y 100.')
 
-while intentosRealizados < 6:
-    print('Intenta adivinar.') # Hay cuatro espacios delante de print.
+while intentosRealizados < 11:
+    print('Intenta adivinar.')
     estimación = input()
     estimación = int(estimación)
     intentosRealizados = intentosRealizados + 1
     if estimación < número:
-        print('Tu estimación es muy baja.') # Hay ocho espacios delante de print.
+        print('Tu estimación es muy baja.')
     if estimación > número:
         print('Tu estimación es muy alta.')
     if estimación == número:
