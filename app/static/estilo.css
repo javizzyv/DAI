@@ -9,3 +9,23 @@ ruby, section, summary, time   , mark, audio, video {
     font   : inherit;
     vertical-align: baseline;
 }
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+header {
+    margin: 2%;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+ul li {
+    margin: 0.3%;
+    text-align: center;
+}
+
+ul li a:link{
+    text-decoration: none;
+}

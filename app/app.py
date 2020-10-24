@@ -252,6 +252,44 @@ def comprobar(datos):
                 return '<h1> No es nada de eso o has introducido mal el dato </h1>'
 
 
+@app.route('/svg')
+
+def inicializarSVG ():
+    import random
+
+    colores = ['red','blue','green','purple','black','white','yellow']
+
+    
+
+    numFiguras = random.randint(1,20)
+
+    resultado = ''
+
+    for _ in range(0,numFiguras):
+        figura = random.randint(1,2)
+
+        alto = random.randint(50,200)
+        ancho = random.randint(50,200)
+
+        trazo = random.choice(colores)
+        relleno = random.choice(colores)
+
+        cx = random.randint(5,100)
+        cy = random.randint(5,100)
+        r = random.randint(10,20)
+
+        x = random.randint(5,100)
+        y = random.randint(5,100)
+        rx = random.randint(10,20)
+        ry = random.randint(10,20)
+
+        if (figura == 1):
+            resultado += '<svg width="350" height="350"><rect x=' + str(x) + ' y=' + str(y) + ' rx=' + str(rx) +  ' ry=' + str(ry) + ' width=' + str(ancho) + ' height=' + str(alto) + ' style="fill:' + str(relleno) +';stroke:' + str(trazo) + ';stroke-width:5;opacity:0.5" /></svg>'
+        elif (figura == 2): 
+            resultado += '<svg width="350" height="350"><circle cx=' + str(cx) + ' cy=' + str(cy) +  ' r=' + str(r) + ' style="fill:' + str(relleno) + ';stroke:' + str(trazo) + ';stroke-width="5";opacity:0.5" /></svg>'
+    
+    return resultado
+
 @app.errorhandler(404)
 
 def page_not_found(error):
