@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block titulo %} Visualizar datos de usuario {% endblock %}
+
+{% block visitada1 %} <a href='/{{visitadas[0]}}' class="list-group-item list-group-item-action bg-light">{{visitadas[0]}}</a>{% endblock %}
+{% block visitada2 %} <a href='/{{visitadas[1]}}' class="list-group-item list-group-item-action bg-light">{{visitadas[1]}}</a>{% endblock %}
+{% block visitada3 %} <a href='/{{visitadas[2]}}' class="list-group-item list-group-item-action bg-light">{{visitadas[2]}}</a>{% endblock %}
+
+{% block contenido %}
+
+<p>Nick: {{nombre}}</p>
+
+<p>Contrasenia: {{contrasenia}}</p>
+
+{% endblock %}

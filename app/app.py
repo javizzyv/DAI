@@ -2,13 +2,33 @@
 from flask import Flask
 from flask import request
 from flask import Response
+from flask import render_template
+from flask import session
+from flask import flash
+from flask import redirect
+from flask import url_for
+from model import *
 app = Flask(__name__)
 
+visitadas = []
+
+app.secret_key = 'super secret key'
+
+visitadas.append('index')
+visitadas.append('ejercicio1')
+visitadas.append('login')
 
 @app.route('/')
 
 def index():
-    return '<a href="static/index.html"><h3> Pincha para ir a la página principal </h3></a>'
+    return render_template('index.html', visitadas=visitadas, usuarioActual=session['usuarioActual'])
+
+
+@app.route('/index')
+
+def inicio():
+    return render_template('index.html', visitadas=visitadas, usuarioActual=session['usuarioActual'])
+
 
 
 @app.route('/user/<username>')
@@ -289,6 +309,100 @@ def inicializarSVG ():
             resultado += '<svg width="350" height="350"><circle cx=' + str(cx) + ' cy=' + str(cy) +  ' r=' + str(r) + ' style="fill:' + str(relleno) + ';stroke:' + str(trazo) + ';stroke-width="5";opacity:0.5" /></svg>'
     
     return resultado
+
+
+@app.route('/login', methods=['GET', 'POST'])
+
+def login():
+    error = None
+    if request.method == 'POST':
+        usuario = request.form['Username']
+        contrasenia = request.form['Password']
+
+        if loginPickle(usuario, contrasenia) == False:
+            error = 'Invalid credentials'
+        else:
+            session['usuarioActual'] = usuario
+            session['contraseniaActual'] = contrasenia
+            usuarioActual = usuario
+            flash('You were successfully logged in')
+            return redirect(url_for('index'))
+    return render_template('login.html', error=error, visitadas=visitadas)
+
+
+@app.route('/registrarse', methods=['GET', 'POST'])
+
+def registrarse():
+    error = None
+    if request.method == 'POST':
+        usuario = request.form['Username']
+        contrasenia = request.form['Password']
+
+        if registroPickle(usuario, contrasenia) == False:
+            error = 'Nick already used'
+        else:
+            session['usuarioActual'] = usuario
+            session['contraseniaActual'] = contrasenia
+            usuarioActual = usuario
+            flash('You were successfully sign in')
+            return redirect(url_for('index'))
+    return render_template('registrarse.html', error=error, visitadas=visitadas)
+
+@app.route('/logout')
+
+def logout():
+    session['usuarioActual'] = 'anon'
+    session['contraseniaActual'] = ''
+    return redirect(url_for('index'))
+
+
+@app.route('/ejercicio1', methods=['GET', 'POST'])
+
+def ejercicio1():
+    if request.method == 'POST':
+        
+        import random
+
+        numero = random.randint(1, 10)
+
+
+        estimacion = request.form['numeroAdivina']
+        estimacion = int(estimacion)
+
+        if estimacion == numero:
+            cadena = '¡Buen trabajo! ¡Mi número es ' + str(numero) + '!'
+            return render_template('enBlanco.html', visitadas=visitadas, contenido=cadena)
+
+        if estimacion != numero:
+            cadena = 'Pues no. El número que estaba pensando era ' + str(numero)
+            return render_template('enBlanco.html', visitadas=visitadas, contenido=cadena)
+
+    return render_template('ejercicio1.html', visitadas=visitadas)
+
+
+@app.route('/editarUsuario', methods=['GET', 'POST'])
+
+def editarU():
+    error = None
+    if request.method == 'POST':
+        usuario = request.form['Username']
+        contrasenia = request.form['Password']
+
+        if editarPickle(usuario, contrasenia, session['usuarioActual']) == False:
+            error = 'Nick already used'
+        else:
+            session['usuarioActual'] = usuario
+            session['contraseniaActual'] = contrasenia
+            usuarioActual = usuario
+            flash('You were successfully changed your profile')
+            return redirect(url_for('index'))
+    return render_template('editarDatos.html', visitadas=visitadas, error=error, nombre=session['usuarioActual'], contrasenia=session['contraseniaActual'])
+
+
+@app.route('/visualizarUsuario')
+
+def visualizarU():
+    return render_template('visualizarDatos.html', visitadas=visitadas, nombre=session['usuarioActual'], contrasenia=session['contraseniaActual'])
 
 @app.errorhandler(404)
 
