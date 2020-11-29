@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block titulo %} Respuesta {% endblock %}
+
+{% block visitada1 %} <a href='/{{visitadas[0]}}' class="list-group-item list-group-item-action bg-light">{{visitadas[0]}}</a>{% endblock %}
+{% block visitada2 %} <a href='/{{visitadas[1]}}' class="list-group-item list-group-item-action bg-light">{{visitadas[1]}}</a>{% endblock %}
+{% block visitada3 %} <a href='/{{visitadas[2]}}' class="list-group-item list-group-item-action bg-light">{{visitadas[2]}}</a>{% endblock %}
+
+{% block contenido %}
+
+{% for pokemon in pokemons %}
+<ul class="list-group">
+    <li class="list-group-item">
+        <p><strong>Nombre:</strong> {{ pokemon['name'] }}</p>
+        <p><strong>Número:</strong> {{ pokemon['num'] }}</p>
+        <p><strong>Tipo:</strong> {{ pokemon['type'] }}</p>
+        <p><strong>Altura:</strong> {{ pokemon['height'] }}</p>
+        <p><strong>Peso:</strong> {{ pokemon['weight'] }}</p>
+        <p><img src="{{ pokemon['img'] }}"></p>
+    </li>
+</ul>
+{% endfor %}
+
+{% endblock %}

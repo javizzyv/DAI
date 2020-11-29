@@ -1,9 +1,20 @@
 # docker-compose.yml
 version: '3.5'
-services: 
-    app:
+
+services:
+    flask:
         build: .
+        depends_on:
+            - mongo
         ports:
             - 5000:5000
         volumes:
             - ./app:/app
+
+    mongo:
+        image: mongo:latest
+        ports:
+            - 27017:27017
+        volumes:
+            - ./dump:/dump              # los datos de prueba
+            - ./datos_db:/data/db       # almacenamiento en el host

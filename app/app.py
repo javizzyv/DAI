@@ -8,6 +8,11 @@ from flask import flash
 from flask import redirect
 from flask import url_for
 from model import *
+from pymongo import MongoClient
+
+client = MongoClient("mongo", 27017)
+db = client.SampleCollections
+
 app = Flask(__name__)
 
 visitadas = []
@@ -28,6 +33,133 @@ def index():
 
 def inicio():
     return render_template('index.html', visitadas=visitadas, usuarioActual=session['usuarioActual'])
+
+
+
+@app.route('/mongo', methods=['GET', 'POST'])
+
+def mongo():
+    error = None
+    lista_pokemon = []
+
+    if request.method == 'POST':
+
+        if 'Tipo' in request.form and 'Nombre' in request.form:
+            id = 0.0
+            numero = 0
+            pokemons = db.samples_pokemon.find()
+            nombre = request.form['Nombre']
+            tipo = request.form['Tipo']
+            altura = request.form['Altura']
+            peso = request.form['Peso']
+            imagen = request.form['Imagen']
+	
+
+            for pokemon in pokemons:
+                if nombre == pokemon['name']:
+                    error = 'Already exists'
+                    return render_template('buscarBD.html', error=error, pokemons=lista_pokemon, visitadas=visitadas)
+                else:
+                    id = int(pokemon['id'])
+                    numero = int(pokemon['num'])
+                
+            id +=+ 1.0
+            numero += 1
+
+            nuevoPKM = { "id": id, "num": numero, "name": nombre, "img": imagen, "type": tipo, "height": altura, "weight": peso }
+            db['samples_pokemon'].insert(nuevoPKM)
+
+            for pokemon in pokemons:
+                if pokemon['name'] == nombre:
+                    lista_pokemon.append(pokemon)
+
+            return render_template('lista.html', pokemons=lista_pokemon, visitadas=visitadas)
+
+
+        if 'NombreBorrar' in request.form:
+                pokemons = db.samples_pokemon.find()
+                nombre = request.form['NombreBorrar']
+        
+                for pokemon in pokemons:
+                    if nombre in pokemon['name']:
+                        db['samples_pokemon'].delete_one(pokemon)
+                        return render_template('buscarBD.html', pokemons=lista_pokemon, visitadas=visitadas)
+                
+                error = 'Not exists'
+                return render_template('buscarBD.html', error=error, pokemons=lista_pokemon, visitadas=visitadas)
+
+        
+        if 'NombreEditar' in request.form:
+                pokemons = db.samples_pokemon.find()
+                nombre = request.form['NombreEditar']
+
+                for pokemon in pokemons:
+                    if nombre in pokemon['name']:
+                        if not request.form['NuevoNombreEditar'] == '':
+                            nombre = request.form['NuevoNombreEditar']
+                        else:
+                            nombre = pokemon['name']
+
+                        if not request.form['TipoEditar'] == '':
+                            tipo = request.form['TipoEditar']
+                        else:
+                            tipo = pokemon['type']
+
+                        if not request.form['AlturaEditar'] == '':
+                            altura = request.form['AlturaEditar']
+                        else:
+                            altura = pokemon['height']
+
+                        if not request.form['PesoEditar'] == '':
+                            peso = request.form['PesoEditar']
+                        else:
+                            peso = pokemon['weight']
+                        
+                        if not request.form['ImagenEditar'] == '':
+                            imagen = request.form['ImagenEditar']
+                        else:
+                            imagen = pokemon['img']
+
+                        editarPKM = { "$set": { "id": pokemon['id'], "num": pokemon['num'], "name": nombre, "img": imagen, "type": tipo, "height": altura, "weight": peso } }
+                        db['samples_pokemon'].update_one(pokemon, editarPKM)
+                        
+                        return render_template('buscarBD.html', pokemons=lista_pokemon, visitadas=visitadas)
+                
+                error = 'Not exists'
+                return render_template('buscarBD.html', error=error, pokemons=lista_pokemon, visitadas=visitadas)
+                
+
+        if 'Nombre' in request.form:
+            nombre = request.form['Nombre']
+            pokemons = db.samples_pokemon.find()
+	
+            for pokemon in pokemons:
+                if nombre in pokemon['name']:
+                    lista_pokemon.append(pokemon)
+            
+
+        if 'Numero' in request.form:
+            numero = request.form['Numero']
+            pokemons = db.samples_pokemon.find()
+	
+            for pokemon in pokemons:
+                if numero in pokemon['num']:
+                    lista_pokemon.append(pokemon)
+
+        if 'Tipo' in request.form:
+            tipo = request.form['Tipo']
+            pokemons = db.samples_pokemon.find()
+	
+            for pokemon in pokemons:
+                if tipo in pokemon['type']:
+                    lista_pokemon.append(pokemon)
+
+        if len(lista_pokemon) > 0:
+            return render_template('lista.html', pokemons=lista_pokemon, visitadas=visitadas)
+        else:
+            error = 'Not exists'
+
+    return render_template('buscarBD.html', error=error, pokemons=lista_pokemon, visitadas=visitadas)
 
 
 
