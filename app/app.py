@@ -12,6 +12,7 @@ from model import *
 app = Flask(__name__)
 
 visitadas = []
+nVisitadas = 0
 
 app.secret_key = 'super secret key'
 
@@ -22,19 +23,133 @@ visitadas.append('login')
 @app.route('/')
 
 def index():
+    if not 'index' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'index'
+        nVisitadas = (nVisitadas+1)%3
+
     return render_template('index.html', visitadas=visitadas, usuarioActual=session['usuarioActual'])
 
 
 @app.route('/index')
 
 def inicio():
+    if not 'index' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'index'
+        nVisitadas = (nVisitadas+1)%3
+    
     return render_template('index.html', visitadas=visitadas, usuarioActual=session['usuarioActual'])
 
+
+# para devolver una lista (GET), o añadir (POST
+@app.route('/api/pokemon', methods=['GET', 'POST'])
+def api_1():
+
+    # Probar con httpie: http http://0.0.0.0:5000/api/pokemon
+    if request.method == 'GET':
+        lista = []
+        buscar = {}
+
+        if not request.args.get('nombre') == None:
+            buscar['name'] = request.args.get('nombre')
+
+        if not request.args.get('numero') == None:
+            buscar['num'] = request.args.get('numero')
+
+        if not request.args.get('tipo') == None:
+            buscar['type'] = request.args.get('tipo')
+
+        lista = buscarListaGet(buscar)
+
+        return lista
+
+    # Probar con httpie: http -f POST http://0.0.0.0:5000/api/pokemon nombre=x tipo=y altura=z peso=t
+    if request.method == 'POST':
+
+        if 'tipo' in request.form:
+            tipo = request.form['tipo']
+        else:
+            tipo = 'Normal'
+
+        if 'nombre' in request.form:
+            nombre = request.form['nombre']
+        else:
+            nombre = 'NombreAux'
+            
+        if 'altura' in request.form:
+            altura = request.form['altura']
+        else:
+            altura = '1 m'
+
+        if 'peso' in request.form:
+            peso = request.form['peso']
+        else:
+            peso = '1 kg'
+
+        res = aniadirPost(nombre, tipo, altura, peso)
+
+        return res
+
+
+# para devolver una, modificar o borrar
+@app.route('/api/pokemon/<id>', methods=['GET', 'PUT', 'DELETE'])
+def api_2(id):
+
+    # Probar con httpie: http http://0.0.0.0:5000/api/pokemon/<id>
+    if request.method == 'GET':
+        res = buscarIdGet(id)
+
+        return res
+
+    # Probar con httpie: http -f PUT http://0.0.0.0:5000/api/pokemon/<id> x=y
+    if request.method == 'PUT':
+    
+        if 'numero' in request.form:
+            numero = request.form['num']
+        else:
+            numero = ''
+
+        if 'tipo' in request.form:
+            tipo = request.form['tipo']
+        else:
+            tipo = ''
+
+        if 'nombre' in request.form:
+            nombre = request.form['nombre']
+        else:
+            nombre = ''
+            
+        if 'altura' in request.form:
+            altura = request.form['altura']
+        else:
+            altura = ''
+
+        if 'peso' in request.form:
+            peso = request.form['peso']
+        else:
+            peso = ''
+
+        res = actualizarPut(nombre, numero, tipo, altura, peso, id)
+
+        return res
+
+    # Probar con httpie: http DELETE http://0.0.0.0:5000/api/pokemon/<id>
+    if request.method == 'DELETE':
+
+        res = eliminarDelete(id)
+
+        return res
 
 
 @app.route('/mongo', methods=['GET', 'POST'])
 
 def mongo():
+    if not 'mongo' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'mongo'
+        nVisitadas = (nVisitadas+1)%3
+
     error = None
     lista_pokemon = []
 
@@ -99,12 +214,22 @@ def bienvenidaUsuario(username):
 @app.route('/hola')
 
 def hello_world():
+    if not 'hola' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'hola'
+        nVisitadas = (nVisitadas+1)%3
+
     return 'Hello, World!'
 
 
 @app.route('/corchetes')
 
 def avisoCorchetes():
+    if not 'corchetes' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'corchetes'
+        nVisitadas = (nVisitadas+1)%3
+
     return '<h3> En la URL, después de <corchetes> debes poner <corchetes>/numero de corchetes que quieres </h3>'
 
 
@@ -140,6 +265,11 @@ def corchetes(secuencia):
 @app.route('/ordena')
 
 def avisoOrdena():
+    if not 'ordena' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'ordena'
+        nVisitadas = (nVisitadas+1)%3
+
     return '<h3> En la URL, después de <ordena> debes poner <ordena>/vector que quieres ordenar ej: 1,2,3,4 </h3>'
 
 
@@ -215,6 +345,11 @@ def ordena(vectorO):
 @app.route('/fibonacci')
 
 def avisoFibonacci():
+    if not 'fibonacci' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'fibonacci'
+        nVisitadas = (nVisitadas+1)%3
+
     return '<h3> En la URL, después de <fibonacci> debes poner <fibonacci>/posicion en la sucesión </h3>'
 
 @app.route('/fibonacci/<numeroF>')
@@ -252,6 +387,11 @@ def fibonacci(numeroF):
 @app.route('/eratostenes')
 
 def avisoEratostenes():
+    if not 'eratostenes' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'eratostenes'
+        nVisitadas = (nVisitadas+1)%3
+
     return '<h3> En la URL, después de <eratostenes> debes poner <eratostenes>/número natural del que quieres que se haga el algoritmo </h3>'
 
 
@@ -291,6 +431,11 @@ def eratostenes(natural):
 @app.route('/comprobar')
 
 def avisoDatos():
+    if not 'comprobar' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'comprobar'
+        nVisitadas = (nVisitadas+1)%3
+
     return '<h3> En la URL, después de <comprobar> debes poner <comprobar>/el dato que quieras comprobar </h3>'
 
 
@@ -334,6 +479,11 @@ def comprobar(datos):
 @app.route('/svg')
 
 def inicializarSVG ():
+    if not 'svg' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'svg'
+        nVisitadas = (nVisitadas+1)%3
+
     import random
 
     colores = ['red','blue','green','purple','black','white','yellow']
@@ -418,6 +568,11 @@ def logout():
 @app.route('/ejercicio1', methods=['GET', 'POST'])
 
 def ejercicio1():
+    if not 'ejercicio1' in visitadas:
+        global nVisitadas
+        visitadas[nVisitadas] = 'ejercicio1'
+        nVisitadas = (nVisitadas+1)%3
+
     if request.method == 'POST':
         
         import random

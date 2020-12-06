@@ -1,5 +1,7 @@
 from pickleshare import *
 from pymongo import MongoClient
+from bson import ObjectId
+from flask import jsonify
 
 client = MongoClient("mongo", 27017)
 db = client.SampleCollections
@@ -57,7 +59,7 @@ def mongoAniadir(name, type, height, weight, img):
             id = int(pokemon['id'])
             numero = int(pokemon['num'])
                 
-    id +=+ 1.0
+    id += 1.0
     numero += 1
 
     nuevoPKM = { "id": id, "num": numero, "name": nombre, "img": imagen, "type": tipo, "height": altura, "weight": peso }
@@ -156,6 +158,145 @@ def mongoEditar(nameE, NuevoNombreEditar, TipoEditar, AlturaEditar, PesoEditar, 
             lista_pokemon.append(editarPKM)
 
     return lista_pokemon
+
+
+def sigNum():
+    pokemons = db.samples_pokemon.find()
+    numero = 0
+
+    for pokemon in pokemons:
+        numero = int(pokemon['num'])
+                
+    numero += 1
+
+    return numero
+
+def sigID():
+    pokemons = db.samples_pokemon.find()
+    id = 0.0
+
+    for pokemon in pokemons:
+        id = int(pokemon['id'])
+                
+    id += 1.0
+    
+    return id
+
+
+def buscarListaGet(buscarG):
+    lista = []
+    buscar = buscarG
+    pokemons = db['samples_pokemon'].find(buscar).sort('name')
+
+    for pokemon in pokemons:
+            lista.append({
+                  'id':    str(pokemon.get('_id')), # pasa a string el ObjectId
+                  'nombre': pokemon.get('name'), 
+                  'tipo':  pokemon.get('type'),
+                  'numero':  pokemon.get('num')
+                })
+    
+    return jsonify(lista)
+
+
+def buscarIdGet(id):
+    try:
+        pokemon = db['samples_pokemon'].find_one({'_id':ObjectId(id)})
+        return jsonify({
+            'id':       id,
+            'nombre':   pokemon.get('name'), 
+            'tipo':     pokemon.get('type'),
+            'numero':   pokemon.get('num')
+        })
+    except:
+        return jsonify({'error':'Not found'}), 404
+
+def aniadirPost(nom, tip, alt, pes):
+
+    pokemons = db.samples_pokemon.find()
+
+    for pokemon in pokemons:
+        if nom == pokemon['name']:
+            return jsonify({'error': 'Already Exists'}), 403
+        
+    nombre = nom
+    tipo = tip
+    altura = alt
+    peso = pes
+    id = ObjectId()
+    idPKMN = sigID()
+    numero = sigNum()
+
+    nuevoPkmn = { "_id": id, "id": idPKMN, "name": nombre , "type": tipo, "num": numero, "height": altura, "weight": peso }
+    db['samples_pokemon'].insert_one(nuevoPkmn)
+
+    return jsonify({
+        'id':       str(id),    # pasa a string el ObjectId
+        'nombre':   nombre, 
+        'tipo':     tipo,
+        'numero':   numero
+    })
+
+def actualizarPut(nom, num, tip, alt, pes, id):
+    pokemons = db.samples_pokemon.find()
+
+    for pokemon in pokemons:
+        if nom == pokemon['name']:
+            return jsonify({'error': 'Already Exists'}), 403
+            
+    try:
+        pokemon = db['samples_pokemon'].find_one({'_id':ObjectId(id)})
+        nombre = nom
+        numero = num
+        tipo = tip
+        altura = alt
+        peso = pes
+        
+
+        if numero == '':
+            numero = pokemon.get('num')
+
+        if tipo == '':
+            tipo = pokemon.get('type')
+
+        if nombre == '':
+            nombre = pokemon.get('name')
+                
+        if altura == '':
+            altura = pokemon.get('height')
+
+        if peso == '':
+            peso = pokemon.get('weight')
+
+        pkmnEdit = { "$set": { "name": nombre , "type": tipo, "num": numero, "height": altura, "weight": peso } }
+        pkmn = { "_id": ObjectId(id) }
+
+        db['samples_pokemon'].update_one(pkmn, pkmnEdit)
+
+        pokemon = db['samples_pokemon'].find_one({'_id': ObjectId(id)})
+
+        return jsonify({
+            'id':       id,
+            'nombre':   pokemon.get('name'),
+            'tipo':     pokemon.get('type'),
+            'numero':   pokemon.get('num')
+        })
+
+    except:
+        return jsonify({'error': 'Not Found'}), 404
+
+def eliminarDelete(id):
+    try:
+        pokemon = db['samples_pokemon'].find_one({'_id': ObjectId(id)})
+
+        db['samples_pokemon'].delete_one({ "_id": ObjectId(id) })
+
+        return jsonify({
+            'id':   id
+        })
+
+    except:
+        return jsonify({'error': 'Not Found'}), 404
 
 def getLista():
     return lista_pokemon
