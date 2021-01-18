@@ -20,7 +20,21 @@ visitadas.append('index')
 visitadas.append('ejercicio1')
 visitadas.append('login')
 
-@app.route('/')
+
+@app.route('/prueba')
+
+def prueba():
+    return render_template('prueba.html')
+
+
+@app.route('/procesarData')
+
+def procesarDatos():
+    return 'SI'
+
+
+
+@app.route('/', methods=['GET', 'POST'])
 
 def index():
     if not 'index' in visitadas:
@@ -28,6 +42,20 @@ def index():
         visitadas[nVisitadas] = 'index'
         nVisitadas = (nVisitadas+1)%3
 
+
+    #error = None
+    #lista_pokemon = []
+
+    if session.get('usuarioActual') == None:
+        session['usuarioActual'] = 'anon'
+        session['contraseniaActual'] = ''
+
+    
+        #if 'Nombre' in request.form:
+            #lista_pokemon = mongoBuscarNombre(request.form['Nombre'])
+            #return render_template('index.html', pokemons=lista_pokemon, visitadas=visitadas, usuarioActual=session['usuarioActual'], error=error)
+        #else:
+            #error = 'Not exists'
     return render_template('index.html', visitadas=visitadas, usuarioActual=session['usuarioActual'])
 
 

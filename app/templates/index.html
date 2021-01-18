@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block cabecera %}
+<script type=text/javascript src="{{url_for('static', filename='jquery.js') }}"></script>
+<script src="static/scripts.js"></script>
+{% endblock %}
+
 {% block titulo %} Indice {% endblock %}
 
 {% block visitada1 %} <a href='/{{visitadas[0]}}' class="list-group-item list-group-item-action bg-light">{{visitadas[0]}}</a>{% endblock %}
@@ -11,5 +16,28 @@
         Esta es la página de inicial de DAI, haz log-in, registrate en la barra de navegacion o ve a algunas de las paginas mas populares en la barra de lateral
     {% else %}
         ¡Bienvenido {{usuarioActual}}, ve a algunas de las paginas mas populares en la barra de lateral!
+    {% endif %}
+
+
+    <div class="login-form">
+        <h2 class="text-center">Buscar un Pokemon</h2>    
+            <input id="buscar" type="text" class="form-control" placeholder="Nombre" name="Nombre" required="required">
+        </div>
+
+        <!--<div class="form-group">
+            <button type="submit" class="btn btn-primary btn-block">Buscar</button>
+        </div> --> 
+    </div>
+
+    <div id="buscar3"></div>
+    <!--<div id="buscar2"><h2>Buscar 2</h2></div>-->
+    <!--<div id="buscar1"><h2>Let jQuery AJAX Change This Text</h2></div>
+    <div id="buscar2"><h2>Buscar 2</h2></div>
+    <button>Get External Content</button>-->
+
+    <button>Dark Mode</button>
+    
+    {% if error == 'Not exists' %}
+        <div class="alert alert-danger alert-dismissible fade show">No existe ese Pokemon</div>
     {% endif %}
 {% endblock %}
